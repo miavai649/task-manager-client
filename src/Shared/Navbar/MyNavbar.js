@@ -1,9 +1,22 @@
-import { Button, Navbar } from 'flowbite-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Avatar, Button, Dropdown, Navbar } from 'flowbite-react';
+import React, { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assests/logo/myLogo.png';
+import { AuthContext } from '../../Context/AuthContext';
 
 const MyNavbar = () => {
+
+  const { logout, user } = useContext(AuthContext);
+  const navigate = useNavigate()
+
+  const handleLogOut = () => {
+    logout()
+      .then(() => {
+        navigate("/login");
+      })
+      .catch((err) => console.error(err));
+  };
+
     return (
         <Navbar
       className='mx-12'
@@ -21,9 +34,28 @@ const MyNavbar = () => {
     </span>
   </Navbar.Brand>
   <div className="flex md:order-2">
-    <Button>
-      Get started
-    </Button>
+  {
+    user?.uid ? <Dropdown
+    arrowIcon={false}
+    inline={true}
+    label={<Avatar alt="User settings" img={user?.photoURL} rounded={true}/>}
+  >
+    <Dropdown.Header>
+      <span className="block text-sm">
+        {user?.displayName}
+      </span>
+      <span className="block truncate text-sm font-medium">
+        {user?.email}
+      </span>
+    </Dropdown.Header>
+    <Dropdown.Divider />
+    <Dropdown.Item onClick={handleLogOut}>
+      Sign out
+    </Dropdown.Item>
+  </Dropdown> : <Link to={'/login'}><Button>
+      Log in
+    </Button></Link>
+  }
     <Navbar.Toggle />
   </div>
   <Navbar.Collapse>
